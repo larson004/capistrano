@@ -60,3 +60,12 @@ end
 Given(/^a stage file named (.+)$/) do |filename|
   TestApp.write_local_stage_file(filename)
 end
+
+Given(/^I make (\d+) deployments$/) do |count|
+  @release_paths = []
+
+  count.to_i.times do |i|
+    TestApp.cap('deploy')
+    @release_paths << run_cli_command( %Q{"readlink -c #{TestApp.current_path}"} ,true)
+  end
+end

@@ -2,6 +2,7 @@ require "English"
 
 module VagrantHelpers
   extend self
+  require 'open3'
 
   class VagrantSSHCommandError < RuntimeError; end
 
@@ -14,14 +15,16 @@ module VagrantHelpers
     end
   end
 
-  def vagrant_cli_command(command)
+  def vagrant_cli_command(command, return_output = false)
     puts "[vagrant] #{command}"
-    Dir.chdir(VAGRANT_ROOT) do
-      `#{VAGRANT_BIN} #{command} 2>&1`.split("\n").each do |line|
-        puts "[vagrant] #{line}"
-      end
+
+    stdout, stderr, status = Dir.chdir(VAGRANT_ROOT) do 
+      Open3.capture3 "#{VAGRANT_BIN} #{command}"
     end
-    $CHILD_STATUS
+    
+    (stdout + stderr).split('\n').each { |line| puts "[vagrant] #{line}" }
+
+    return_output ? stdout : status
   end
 
   def run_vagrant_command(command)

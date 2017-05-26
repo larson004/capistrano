@@ -3,6 +3,7 @@ require "fileutils"
 require "pathname"
 
 module TestApp
+  require 'pry'
   extend self
 
   def install
